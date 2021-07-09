@@ -91,7 +91,7 @@ test_squid_speed(){
 }
 
 test_simple_http_speed(){
-    # wget http://cachefly.cachefly.net/100mb.test
+    wget http://cachefly.cachefly.net/100mb.test
 }
 
 
