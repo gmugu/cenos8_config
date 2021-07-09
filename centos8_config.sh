@@ -3,7 +3,6 @@ PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin
 export PATH
 
 sh_ver="0.0.1"
-github="raw.githubusercontent.com/chiakge/Linux-NetSpeed/master"
 
 Green_font_prefix="\033[32m" && Red_font_prefix="\033[31m" && Green_background_prefix="\033[42;37m" && Red_background_prefix="\033[41;37m" && Font_color_suffix="\033[0m"
 Info="${Green_font_prefix}[信息]${Font_color_suffix}"
@@ -30,22 +29,33 @@ check_bbr_status(){
         fi
     fi
 
+    
+}
+
+echo_bbr_status(){
+    check_bbr_status
     if [[ ${kernel_status} == "noinstall" ]]; then
         echo -e " 当前状态: ${Green_font_prefix}未安装${Font_color_suffix} 加速内核 ${Red_font_prefix}请先安装内核${Font_color_suffix}"
     else
         echo -e " 当前状态: ${Green_font_prefix}已安装${Font_color_suffix} ${_font_prefix}${kernel_status}${Font_color_suffix} 加速内核 , ${Green_font_prefix}${run_status}${Font_color_suffix}"
     fi
 }
+
 #启用BBR
 startbbr(){
+    check_bbr_status
 
-	sed -i '/net.core.default_qdisc/d' /etc/sysctl.conf
-    sed -i '/net.ipv4.tcp_congestion_control/d' /etc/sysctl.conf
-	sleep 1s
-    echo "net.core.default_qdisc=fq" >> /etc/sysctl.conf
-	echo "net.ipv4.tcp_congestion_control=bbr" >> /etc/sysctl.conf
-	sysctl -p
-	echo -e "${Info}BBR启动成功！"
+    if [[ ${kernel_status} == "noinstall" ]]; then
+        echo -e "${Error},当前操作系统 ${Green_font_prefix}未安装${Font_color_suffix} 加速内核"
+    else
+        sed -i '/net.core.default_qdisc/d' /etc/sysctl.conf
+        sed -i '/net.ipv4.tcp_congestion_control/d' /etc/sysctl.conf
+        sleep 1s
+        echo "net.core.default_qdisc=fq" >> /etc/sysctl.conf
+        echo "net.ipv4.tcp_congestion_control=bbr" >> /etc/sysctl.conf
+        sysctl -p
+        echo -e "${Info}BBR启动成功！"
+    fi
 }
 
 install_run_test_squid(){
@@ -81,7 +91,7 @@ test_squid_speed(){
 }
 
 test_simple_http_speed(){
-    wget http://cachefly.cachefly.net/100mb.test
+    # wget http://cachefly.cachefly.net/100mb.test
 }
 
 
@@ -105,7 +115,7 @@ start_menu(){
     read -p " 请输入数字 [0-11]:" num
     case "$num" in
         0)
-        check_bbr_status
+        echo_bbr_status
         ;;
         1)
         startbbrmod
@@ -136,6 +146,7 @@ start_menu(){
         start_menu
         ;;
     esac
+    start_menu
 }
 
 start_menu
