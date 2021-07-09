@@ -73,25 +73,44 @@ install_run_test_squid(){
 run_simpleproxy(){
     read -p " 请输入port:" port
     read -p " 请输入mask:" mask
+    read -p " 请输入日志等级（0：什么日志都不记录 1：只记录错误日志 2：记录所有日志）" log_level
 
-    chmod a+x ./service/tcp_proxy_service.py --port=$port --mask=$mask
-    # nohup ./service/tcp_proxy_service.py > /dev/null 2>&1 &                      #什么日志都不记录
-    # nohup ./service/tcp_proxy_service.py > /dev/null 2>tcp_proxy_service.error & #只记录错误日志
-    nohup ./service/tcp_proxy_service.py > tcp_proxy_service.log 2>&1 &          #记录所有日志
+    killall tcp_proxy_service.py
+    chmod a+x ./simple-proxy/service/tcp_proxy_service.py
+
+    case "$log_level" in
+        0)
+        nohup ./simple-proxy/service/tcp_proxy_service.py --port=$port --mask=$mask > /dev/null 2>&1 &                      #什么日志都不记录
+        ;;
+        1)
+        nohup ./simple-proxy/service/tcp_proxy_service.py --port=$port --mask=$mask > /dev/null 2>tcp_proxy_service.error & #只记录错误日志
+        ;;
+        2)
+        nohup ./simple-proxy/service/tcp_proxy_service.py --port=$port --mask=$mask > tcp_proxy_service.log 2>&1 &          #记录所有日志
+        ;;
+        *)
+        echo -e "${Error}:请输入正确数字 [0-2]"
+        ;;
+    esac
     echo -e "${Info}开启simple_proxy成功！"
 }
 
 test_net_speed(){
     wget http://cachefly.cachefly.net/100mb.test
+    rm -rf 100mb.test*
 }
 
 test_squid_speed(){
     echo -e "${Info}测试代理网速！"
     wget http://cachefly.cachefly.net/100mb.test -e http_proxy=127.0.0.1:3128
+    rm -rf 100mb.test*
 }
 
 test_simple_http_speed(){
-    wget http://cachefly.cachefly.net/100mb.test
+    python ./simple-proxy/client/tcp_proxy_client.py --host=127.0.0.1 --remote-port=$port --local-port=10088 --mask=$mask
+    wget http://cachefly.cachefly.net/100mb.test -e http_proxy=127.0.0.1:10088
+    rm -rf 100mb.test*
+    killall tcp_proxy_client.py
 }
 
 
@@ -117,7 +136,7 @@ start_menu(){
         echo_bbr_status
         ;;
         1)
-        startbbrmod
+        startbbr
         ;;
         2)
         install_run_test_squid
@@ -146,6 +165,8 @@ start_menu(){
         start_menu
         ;;
     esac
+    echo
+    echo -e "------------------------------"
     start_menu
 }
 clear
