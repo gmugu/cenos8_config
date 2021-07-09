@@ -107,7 +107,9 @@ test_squid_speed(){
 }
 
 test_simple_http_speed(){
-    python ./simple-proxy/client/tcp_proxy_client.py --host=127.0.0.1 --remote-port=$port --local-port=10088 --mask=$mask &
+    killall tcp_proxy_client.py
+    chmod a+x ./simple-proxy/client/tcp_proxy_client.py
+    ./simple-proxy/client/tcp_proxy_client.py --host=127.0.0.1 --remote-port=$port --local-port=10088 --mask=$mask &
     sleep 1s
     wget http://cachefly.cachefly.net/100mb.test -e http_proxy=127.0.0.1:10088
     rm -rf 100mb.test*
