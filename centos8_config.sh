@@ -107,7 +107,8 @@ test_squid_speed(){
 }
 
 test_simple_http_speed(){
-    python ./simple-proxy/client/tcp_proxy_client.py --host=127.0.0.1 --remote-port=$port --local-port=10088 --mask=$mask
+    python ./simple-proxy/client/tcp_proxy_client.py --host=127.0.0.1 --remote-port=$port --local-port=10088 --mask=$mask &
+    sleep 1s
     wget http://cachefly.cachefly.net/100mb.test -e http_proxy=127.0.0.1:10088
     rm -rf 100mb.test*
     killall tcp_proxy_client.py
@@ -116,7 +117,8 @@ test_simple_http_speed(){
 
 #开始菜单
 start_menu(){
-    echo && echo -e "一键安装管理脚本 ${Red_font_prefix}[v${sh_ver}]${Font_color_suffix}
+    echo && echo -e "————————————————————————————————
+    一键安装管理脚本 ${Red_font_prefix}[v${sh_ver}]${Font_color_suffix}
     
     ${Green_font_prefix}0.${Font_color_suffix} 检查BBR加速状态
     ${Green_font_prefix}1.${Font_color_suffix} 使用BBR加速
@@ -166,7 +168,6 @@ start_menu(){
         ;;
     esac
     echo
-    echo -e "------------------------------"
     start_menu
 }
 clear
