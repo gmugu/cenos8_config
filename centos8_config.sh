@@ -97,7 +97,6 @@ test_simple_http_speed(){
 
 #开始菜单
 start_menu(){
-    clear
     echo && echo -e "一键安装管理脚本 ${Red_font_prefix}[v${sh_ver}]${Font_color_suffix}
     
     ${Green_font_prefix}0.${Font_color_suffix} 检查BBR加速状态
@@ -143,10 +142,11 @@ start_menu(){
         clear
         echo -e "${Error}:请输入正确数字 [0-11]"
         sleep 5s
+        clear
         start_menu
         ;;
     esac
     start_menu
 }
-
+clear
 start_menu
