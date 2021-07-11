@@ -10,7 +10,6 @@ from selectors import DefaultSelector, EVENT_READ
 
 # Proxy开放的端口号
 LOCAL_PORT = 7088
-# REMOTE_ADDR = "104.168.211.94"
 REMOTE_ADDR = "hachinasp.duckdns.org"
 REMOTE_PORT = 7088
 
